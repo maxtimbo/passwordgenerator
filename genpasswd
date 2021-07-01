@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import urllib.request
+import random, pyperclip
+
+def get_word_list():
+    word_url = "https://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
+    req = urllib.request.Request(word_url, headers=headers)
+    response = urllib.request.urlopen(req)
+    long_txt = response.read().decode()
+    return long_txt.splitlines()
+
+def generate_words(word_list):
+    lower_words = [word.capitalize() for word in word_list if not word[0].isupper()]
+    return ''.join([lower_words[random.randint(0, len(lower_words))] for i in range(2)])
+
+def yes_no(question) -> bool:
+    reply = None
+    while reply not in ("", "y", "n"):
+        reply = input(f"{question} (Y/n): ").lower()
+    return (reply in ("", "y"))
+
+
+if __name__ == '__main__':
+    word_list = get_word_list()
+    question = "Is this the one?"
+    print("Generating 100 passwords...")
+    for n in range(100):
+        p = f"{generate_words(word_list)}{random.randint(100, 999)}"
+        print("\n", p)
+        if yes_no(question):
+            pyperclip.copy(p)
+            break
+
+    print(p, "Copied to clipboard")
